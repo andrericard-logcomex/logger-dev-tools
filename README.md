@@ -1,1 +1,1 @@
-# logger-chrome-dev-tools
+# logger-dev-tools
