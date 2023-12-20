@@ -21,11 +21,8 @@ chrome.runtime.onInstalled.addListener(() => {
 
 async function getToken(url, timeout = 5000) {
   try {
-    const email1 = await chrome.storage.local.get('email');
-    const password1 = await chrome.storage.local.get('senha');
-
-    const email = email1.email;
-    const password = password1.senha;
+    const {email} = await chrome.storage.local.get('email');
+    const {senha: password} = await chrome.storage.local.get('senha');
 
     const controller = new AbortController();
     const signal = controller.signal;
@@ -43,9 +40,7 @@ async function getToken(url, timeout = 5000) {
 
     const resp = await response.json();
 
-    return {
-      token: resp.auth.access_token, email: email,
-    };
+    return {token: resp.auth.access_token, email: email};
   }
   catch (error) {
     chrome.notifications.create({
@@ -62,47 +57,22 @@ async function getToken(url, timeout = 5000) {
 }
 
 function acessarPlataforma(url, token, email) {
-  chrome.tabs.create({
-    url: url + '?token=' + token + '&email=' + email + '&cookiesHasBeenAccepted=true',
-  });
+  chrome.tabs.create({url: url + '?token=' + token + '&email=' + email + '&cookiesHasBeenAccepted=true'});
 }
 
-function acessarLocal() {
-  getToken(AUTH_HOMOLOGACAO).then(r => acessarPlataforma(PLATAFORMA_LOCAL, r.token, r.email));
-}
-
-function acessarHomologacao() {
-  getToken(AUTH_HOMOLOGACAO).then(r => acessarPlataforma(PLATAFORMA_HOMOLOGACAO, r.token, r.email));
-}
-
-function acessarProducao() {
-  getToken(AUTH_PRODUCAO).then(r => acessarPlataforma(PLATAFORMA_PRODUCAO, r.token, r.email));
-}
-
-chrome.commands.onCommand.addListener(function(command) {
-  switch (command) {
+function evaluate(id) {
+  switch (id) {
     case 'autologinLocal':
-      acessarLocal();
+      getToken(AUTH_HOMOLOGACAO).then(r => acessarPlataforma(PLATAFORMA_LOCAL, r.token, r.email));
       break;
     case 'autologinHomologacao':
-      acessarHomologacao();
+      getToken(AUTH_HOMOLOGACAO).then(r => acessarPlataforma(PLATAFORMA_HOMOLOGACAO, r.token, r.email));
       break;
     case 'autologinProducao':
-      acessarProducao();
+      getToken(AUTH_PRODUCAO).then(r => acessarPlataforma(PLATAFORMA_PRODUCAO, r.token, r.email));
       break;
   }
-});
+}
 
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-  switch (info.menuItemId) {
-    case 'autologinLocal':
-      acessarLocal();
-      break;
-    case 'autologinHomologacao':
-      acessarHomologacao();
-      break;
-    case 'autologinProducao':
-      acessarProducao();
-      break;
-  }
-});
+chrome.commands.onCommand.addListener(command => evaluate(command));
+chrome.contextMenus.onClicked.addListener(info => evaluate(info.menuItemId));
