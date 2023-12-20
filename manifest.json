@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "Logger DevTools",
+  "description": "Extensão para desenvolvedores da Logcomex.",
+  "version": "0.1.0",
+  "icons": {
+    "16": "images/icon-16.png",
+    "32": "images/icon-32.png",
+    "48": "images/icon-48.png",
+    "128": "images/icon-128.png"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "autologinLocal": {
+      "suggested_key": {
+        "default": "Alt+Shift+P",
+        "mac": "Alt+Shift+P"
+      },
+      "description": "Acessar Local"
+    },
+    "autologinHomologacao": {
+      "suggested_key": {
+        "default": "Alt+Shift+H",
+        "mac": "Alt+Shift+H"
+      },
+      "description": "Acessar Homologação"
+    },
+    "autologinProducao": {
+      "suggested_key": {
+        "default": "Alt+Shift+L",
+        "mac": "Alt+Shift+L"
+      },
+      "description": "Acessar Produção"
+    }
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "contextMenus",
+    "tabs",
+    "scripting",
+    "notifications"
+  ]
+}
